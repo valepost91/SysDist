@@ -21,6 +21,11 @@ public class Server implements Hello {
     public String sayHello() {
         return "Hello, world!";
     }
+    
+    public String doTask(String s){
+        //don't know what to put here
+        return "Task done.";
+    }
         
     public static void main(String args[]) {
         

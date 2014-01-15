@@ -17,34 +17,42 @@ import java.rmi.registry.Registry;
 
 public class Client {
 
-    private Client() {}
+    private Client() {
+    }
+
+    public void sendRequest(String s) {
+
+    }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-		FileReader f;
-		f=new FileReader("prova.txt");
+        String host = (args.length < 1) ? null : args[0];
 
-		BufferedReader b;
-		b=new BufferedReader(f);
-        
-		String s;
+        FileReader f;
+        f = new FileReader("Makefile");
 
-		while(true) {
-			s=b.readLine();
-				if(s==null)
-					break;
-			System.out.println(s);
-		}
-		
-		String host = (args.length < 1) ? null : args[0];
-        try {
-            Registry registry = LocateRegistry.getRegistry(host);
-            Hello stub = (Hello) registry.lookup("Hello");
-            String response = stub.sayHello();
-            System.out.println("response: " + response);
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
+        BufferedReader b;
+        b = new BufferedReader(f);
+
+        String s;
+
+        while (true) {
+            s = b.readLine();
+            if (s == null) {
+                break;
+            }
+            System.out.println(s);
+
+            try {
+                Registry registry = LocateRegistry.getRegistry(host);
+                Task stub = (Task) registry.lookup("Task");
+                String response = stub.doTask(s);
+                System.out.println("response: " + response);
+            } catch (Exception e) {
+                System.err.println("Client exception: " + e.toString());
+                e.printStackTrace();
+            }
         }
+
     }
 }
