@@ -1,15 +1,15 @@
-To compile:
+####To compile:
 
-	javac -d <destDir> Slave.java Master.java
+	javac -d . Slave/Slave.java Slave/Task.java Master/Master.java
 
-Start Java RMI registry:
+####Start Java RMI registry:
 
-	start rmiregistry <PortNumber>
+	start rmiregistry
 
-Start the Slave:
+####Start the Slave:
 
-	start java -classpath <classDir> -Djava.rmi.slave.codebase=file:<classDir>/ Slave
+	java Slave
 
-Start the Master:
+####Start the Master:
 
-	java  -classpath <classDir> Master
+	java Master

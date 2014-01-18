@@ -1,0 +1,4 @@
+echo Hello World!
+echo I'm gonna show you know your directories:
+dir
+echo Cool, eh?

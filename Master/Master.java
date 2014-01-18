@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author Valerio
@@ -14,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.NotBoundException;
 
 public class Master {
 
@@ -28,26 +23,34 @@ public class Master {
 
         String host = (args.length < 1) ? null : args[0];
 
-        FileReader f;
-        f = new FileReader("./makefiles/premier/Makefile");
+        // Makefile input (hardcoded path)
+        //FileReader f = new FileReader("./makefiles/premier/Makefile");
+        FileReader f = new FileReader("./makefile_test");
 
-        BufferedReader b;
-        b = new BufferedReader(f);
+        BufferedReader b = new BufferedReader(f);
 
-        String s;
+        // Retrieves the Registry and the remote function
+        Registry registry = LocateRegistry.getRegistry(host);
+        Task stub = null;
+        try {
+            stub = (Task) registry.lookup("Task");
+        } catch (NotBoundException e) {
+            System.err.println
+            ("ERROR: not bound. Are you running the Registry and the Slave already?\n");
+        }
 
         while (true) {
-            s = b.readLine();
-            if (s == null) {
+            // Read line by line and prints it
+            String s;
+            if ((s = b.readLine()) == null)
                 break;
-            }
-            System.out.println(s);
+            System.out.println("[LINE] " + s);
 
-            try {
-                Registry registry = LocateRegistry.getRegistry(host);
-                Task stub = (Task) registry.lookup("Task");
+            // Call remote function which will process the line
+            try {                
                 String response = stub.doTask(s);
-                System.out.println("response: " + response);
+                System.out.println("[RESPONSE] " + response);
+            
             } catch (Exception e) {
                 System.err.println("Client exception: " + e.toString());
                 e.printStackTrace();
