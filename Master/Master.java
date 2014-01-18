@@ -23,11 +23,13 @@ public class Master {
 
         String host = (args.length < 1) ? null : args[0];
 
-        // Makefile input (hardcoded path)
         //FileReader f = new FileReader("./makefiles/premier/Makefile");
-        FileReader f = new FileReader("./makefile_test");
-
-        BufferedReader b = new BufferedReader(f);
+        /*FileReader f = new FileReader("./makefile_test");
+        BufferedReader b = new BufferedReader(f);*/
+        
+        // Parse Makefile
+        MakefileStruct m = new MakefileStruct("./makefile_test");
+        m.print(); //debug
 
         // Retrieves the Registry and the remote function
         Registry registry = LocateRegistry.getRegistry(host);
@@ -39,6 +41,7 @@ public class Master {
             ("ERROR: not bound. Are you running the Registry and the Slave already?\n");
         }
 
+        /*
         while (true) {
             // Read line by line and prints it
             String s;
@@ -56,6 +59,7 @@ public class Master {
                 e.printStackTrace();
             }
         }
+        */
 
     }
 }
