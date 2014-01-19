@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 
 public class Master {
@@ -44,6 +45,28 @@ public class Master {
     public void sendRequest(String s) {
 
     }
+    
+    private static Task[] retrieveRemoteSlaves(String host, int slavesCount) throws RemoteException {
+        Task stubs[] = new Task[slavesCount];
+        
+        Registry registry = LocateRegistry.getRegistry(host);
+        
+        boolean allOk = true;
+        for (int i = 0; i < slavesCount; i++) {
+            try {
+                stubs[i] = (Task) registry.lookup("slave" + i);
+            } catch (NotBoundException e) {
+                System.err.println
+                ("ERROR: Slave " + i + " not bound. Are you running the Registry and this Slave?\n");
+                allOk = false;
+            }
+        }
+        
+        if (allOk)
+            return null;
+        else
+            return stubs;
+    }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
@@ -57,27 +80,15 @@ public class Master {
             int slavesCount = Integer.parseInt(args[0]);
             String host = (args.length == 2) ? args[1] : null;
 
-            // Retrieves the Registry and the slaves
-            Registry registry = LocateRegistry.getRegistry(host);
-            Task stubs[] = new Task[slavesCount];
-            boolean allOk = true;
-            for (int i = 0; i < slavesCount; i++) {
-                try {
-                    stubs[i] = (Task) registry.lookup("slave" + i);
-                } catch (NotBoundException e) {
-                    System.err.println
-                    ("ERROR: Slave " + i + " not bound. Are you running the Registry and this Slave?\n");
-                    allOk = false;
-                }
-            }
+            Task stubs[] = retrieveRemoteSlaves(host, slavesCount);
             
-            if (allOk) {
+            if (stubs!=null) {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
                 //boolean ret = stubs[0].transferFile(convertFileToBytes("README.md") ,"test.md");
                         
                 // Parse Makefile
-                //MakefileStruct m = new MakefileStruct("./makefile_test");
+                MakefileStruct m = new MakefileStruct("./makefile_test");
                 //m.print(); //debug
             }
             else
