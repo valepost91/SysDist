@@ -3,6 +3,9 @@
  * @author Valerio
  */
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
@@ -38,6 +41,27 @@ public class Slave implements Task {
         }
 
         return output.toString();
+    }
+    
+    public boolean transferFile(byte[] b, String filename) {
+        
+        for (int i = 0; i < b.length; i++) {
+            System.out.print((char)b[i]);
+        }
+        
+        try {
+             FileOutputStream fos = new FileOutputStream(filename);
+             fos.write(b);
+             fos.close();
+        }
+        catch(FileNotFoundException ex)   {
+             System.out.println("FileNotFoundException : " + ex);
+        }
+        catch(IOException ioe)  {
+             System.out.println("IOException : " + ioe);
+        }
+        
+        return true;
     }
 
     public static void main(String args[]) {
