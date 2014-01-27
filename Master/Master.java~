@@ -95,7 +95,7 @@ public class Master {
                     ArrayList<String> dep = m.getRules().get(i).getDependencies();
                     //choose stub
                     for(String d : dep){
-                        stubs[0].receiveFile(d);
+                        stubs[0].sendFile(d);
                     }
                     ArrayList<String> commands= m.getRuleCommands(i);
                     for(String c : commands){

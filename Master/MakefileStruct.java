@@ -21,6 +21,10 @@ public final class MakefileStruct {
     public class Rule {
         String name;
         ArrayList< String > dependencies;
+
+        public ArrayList<String> getDependencies() {
+            return dependencies;
+        }
         ArrayList< String > commands;
         
         public Rule(String name) {
@@ -144,6 +148,10 @@ public final class MakefileStruct {
             }
         }
     }
+
+    public ArrayList<Rule> getRules() {
+        return rules;
+    }
     
     public int getRulesCount() {
         return rules.size();
@@ -188,6 +196,5 @@ public final class MakefileStruct {
     public String getRuleName(int index) {
         return rules.get(index).name;
     }
-    
     
 };
