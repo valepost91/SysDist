@@ -11,7 +11,7 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Slave implements Task {
+public class Slave implements SlaveStub {
 
     public Slave() {
     }
@@ -88,7 +88,7 @@ public class Slave implements Task {
         
             try {
                 Slave obj = new Slave();
-                Task stub = (Task) UnicastRemoteObject.exportObject(obj, 0);
+                SlaveStub stub = (SlaveStub) UnicastRemoteObject.exportObject(obj, 0);
 
                 // Retrieves the remote Registry
                 Registry registry = LocateRegistry.getRegistry(host);

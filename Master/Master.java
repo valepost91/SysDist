@@ -2,59 +2,35 @@
  *
  * @author Valerio
  */
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class Master {
 
     private Master() {
     }
-    
-    private static byte[] convertFileToBytes(String path) {
-        File file = new File(path);
-
-        byte[] b = new byte[(int) file.length()];
-        try {
-              FileInputStream fileInputStream = new FileInputStream(file);
-              fileInputStream.read(b);
-              for (int i = 0; i < b.length; i++) {
-                  System.out.print((char)b[i]);
-              }
-         } catch (FileNotFoundException e) {
-                     System.out.println("File Not Found.");
-                     e.printStackTrace();
-         }
-         catch (IOException e1) {
-                  System.out.println("Error Reading The File.");
-                   e1.printStackTrace();
-         }
         
-        return b;
-    }
-
-    
-    private static Task[] retrieveRemoteSlaves(String host, int slavesCount) throws RemoteException {
-        Task stubs[] = new Task[slavesCount];
+    private static Machine[] retrieveRemoteSlaves(String host, int slavesCount) throws RemoteException {
+        Machine machs[] = new Machine[slavesCount];
+        SlaveStub stubs[] = new SlaveStub[slavesCount];
         
         Registry registry = LocateRegistry.getRegistry(host);
         
         boolean allOk = true;
         for (int i = 0; i < slavesCount; i++) {
             try {
-                stubs[i] = (Task) registry.lookup("slave" + i);
+                //stubs[i].s = (SlaveStub) registry.lookup("slave" + i);
+                machs[i] = new Machine();
+                machs[i].setStub( (SlaveStub) registry.lookup("slave" + i) );
+                
                 
             } catch (NotBoundException e) {
                 System.err.println
@@ -66,32 +42,13 @@ public class Master {
         if (!allOk)
             return null;
         else
-            return stubs;
+            return machs;
     }
     
-    private static void runDistributedMakefile(MakefileStruct m, Task stubs[]) throws RemoteException {
+    private static void runDistributedMakefile(MakefileStruct m, MachinesList machs) throws RemoteException {
         
-        ArrayList<Rule> rules = m.getRules();
-        
-        // Executes rules from the end of the Makefile to the beggining, so dependencies 
-        //   should be automatically satisfied.
-        for (int i = rules.size()-1; i>0; i--) {
-            ArrayList<String> dep = rules.get(i).getDependencies();
-            
-            // Send file from dependency, if there is one
-            for(String d : dep){
-                System.out.println("Sending file " + d);
-                stubs[0].receiveFile(convertFileToBytes(d), d);
-            }
-            
-            // Sends this rule's commands to the slave            
-            ArrayList<String> commands = m.getRuleCommands(i);
-            for(String c : commands){
-                System.out.println("Sending to the slave the command " + c);
-                String response = stubs[0].doTask(c);
-                System.out.println(response);
-            }
-        }
+        RuleRunner rootRunner = new RuleRunner(0, machs, m);
+        rootRunner.start();
     }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
@@ -106,15 +63,15 @@ public class Master {
             int slavesCount = Integer.parseInt(args[0]);
             String host = (args.length == 2) ? args[1] : null;
 
-            Task stubs[] = retrieveRemoteSlaves(host, slavesCount);
+            MachinesList machs = new MachinesList( retrieveRemoteSlaves(host, slavesCount) );
             //stubs.toString();
-            if (stubs!=null) {
+            if (machs!=null) {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
-                MakefileStruct m = new MakefileStruct("./makefile_test");
-                //m.print(); //debug
+                MakefileStruct m = new MakefileStruct("./makefile_test_simple");
+                m.print(); //debug
                 
-                runDistributedMakefile(m,stubs);
+                runDistributedMakefile(m,machs);
             }
             else
                 System.out.println("Couldn't bind all Slaves, exiting now...");
