@@ -14,6 +14,8 @@ import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Master {
@@ -61,7 +63,7 @@ public class Master {
             }
         }
         
-        if (allOk)
+        if (!allOk)
             return null;
         else
             return stubs;
@@ -80,7 +82,7 @@ public class Master {
             String host = (args.length == 2) ? args[1] : null;
 
             Task stubs[] = retrieveRemoteSlaves(host, slavesCount);
-            stubs.toString();
+            //stubs.toString();
             if (stubs!=null) {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
@@ -90,17 +92,23 @@ public class Master {
                 MakefileStruct m = new MakefileStruct("./makefile_test");
                 //m.print(); //debug
                 ArrayList<Rule> rules = m.getRules();
-                Integer i;
-                for (i=m.getRulesCount()-1;i>0;i--){
-                    ArrayList<String> dep = m.getRules().get(i).getDependencies();
+                for (int i = rules.size()-1; i>0; i--) {
+                    ArrayList<String> dep = rules.get(i).getDependencies();
                     //choose stub
                     for(String d : dep){
-                        stubs[0].receiveFile(d);
+                        System.out.println("Sending file " + d);
+                        stubs[0].receiveFile(convertFileToBytes(d), d);
                     }
                     ArrayList<String> commands= m.getRuleCommands(i);
                     for(String c : commands){
                         String response = stubs[0].doTask(c);
                         System.out.println(response);
+                    }
+                    
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Master.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }

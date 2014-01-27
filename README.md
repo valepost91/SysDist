@@ -4,7 +4,7 @@ To compile
 
 This will save all .class files in the root folder:
 
-	javac -d . Master/Master.java Slave/Slave.java Slave/Task.java Master/MakefileStruct.java
+	javac -d . Master/Master.java Slave/Slave.java Slave/Task.java Master/MakefileStruct.java Master/Rule.java
 	
 Remove the "-d . " option if you want to the .class files to be saved in the respective folders.
 

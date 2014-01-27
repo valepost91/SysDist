@@ -21,9 +21,11 @@ public class Slave implements Task {
         
         StringBuffer output = new StringBuffer();
         
+        System.out.println("Received command" + command);
+        
         Process p;
         try {
-            p = Runtime.getRuntime().exec("cmd.exe /c" + command);
+            p = Runtime.getRuntime().exec("D:\\Software\\bin\\bash.exe -e " + command);
             p.waitFor();
             BufferedReader reader
                     = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -39,11 +41,13 @@ public class Slave implements Task {
             ("ERROR: failed to execute the following command received: " + command);
             //e.printStackTrace();
         }
+        
+        System.out.println("Processing OK. Result: " + output.toString());
 
         return output.toString();
     }
     
-    public boolean transferFile(byte[] b, String filename) {
+    public boolean receiveFile(byte[] b, String filename) {
         
         for (int i = 0; i < b.length; i++) {
             System.out.print((char)b[i]);
@@ -92,7 +96,7 @@ public class Slave implements Task {
                 //   same, so we don't have to reestart the Registry each time.
                 registry.rebind("slave" + myId, stub);
                 
-                System.err.println("Slave ready, sir.");
+                System.err.println("Slave " + myId + " ready, sir.");
             } catch (Exception e) {
                 System.err.println("Slave exception: " + e.toString());
                 System.err.println("Have you executed \"start remiregistry\" already?");
