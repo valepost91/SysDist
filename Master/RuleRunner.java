@@ -7,19 +7,17 @@ import java.util.logging.Logger;
 class RuleRunner extends Thread {
    MakefileStruct m;
    MachinesList machs;
-   int ruleId;
+   Rule r;
 
-   RuleRunner(int ruleId, MachinesList machs, MakefileStruct m) {
-      this.ruleId = ruleId;
+   RuleRunner(Rule myRule, MachinesList machs, MakefileStruct m) {
+      this.r = myRule;
       this.m = m;      
       this.machs = machs;
    }
 
    @Override
    public void run() {
-       Rule r = m.getRules().get(ruleId);
-       
-       System.out.println("Starting RuleRunner thread for rule : " + r.name);
+       System.out.println("Starting RuleRunner thread for rule : " + r.getName());
        
        // Sleep for 1000 ms
        try {
@@ -28,9 +26,7 @@ class RuleRunner extends Thread {
            Logger.getLogger(RuleRunner.class.getName()).log(Level.SEVERE, null, ex);
        }
        
-       int randomIndex = ruleId+1;
-       
-       ArrayList<String> deps = r.getDependencies();
+       ArrayList<Rule> deps = r.getDependencies();
        
        // If it's not a leaf, check for the dependencies
        if (deps.size()>0) {
@@ -38,7 +34,7 @@ class RuleRunner extends Thread {
            
            // Launch a new thread for each dependency
            for (int i = 0; i < deps.size(); i++) {
-               depRunners[i] = new RuleRunner(randomIndex++, machs, m);
+               depRunners[i] = new RuleRunner(deps.get(i), machs, m);
                depRunners[i].start();               
            }
            
@@ -53,7 +49,8 @@ class RuleRunner extends Thread {
        } 
        
         // Sends this rule's commands to the slave.   
-        ArrayList<String> commands = m.getRuleCommands(ruleId);
+        ArrayList<String> commands = r.getCommands();
+        
         for(String c : commands){
             String response = null;
             try {
@@ -74,6 +71,9 @@ class RuleRunner extends Thread {
             }
             System.out.println(response);
         }
+        
+        // Set this rule as DONE
+        r.isDone = true;
        
    }
 

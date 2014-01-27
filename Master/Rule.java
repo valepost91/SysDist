@@ -7,14 +7,13 @@ public class Rule {
     private ArrayList< Rule > dependencies;
     private ArrayList< String > commands;
     private String name;
-
-    public Rule() {
-    }
+    public boolean isDone;
      
     public Rule(String name) {
         this.name=name;
         dependencies = new ArrayList<>();
         commands = new ArrayList<>();
+        isDone = false;
     }
 
     public Rule(String name, ArrayList<Rule> dependencies, ArrayList<String> commands) {

@@ -54,7 +54,7 @@ public class Master {
     
     private static void runDistributedMakefile(MakefileStruct m, MachinesList machs) throws RemoteException {
         
-        RuleRunner rootRunner = new RuleRunner(0, machs, m);
+        RuleRunner rootRunner = new RuleRunner(m.root, machs, m);
         rootRunner.start();
     }
 
@@ -76,10 +76,8 @@ public class Master {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
                 MakefileStruct m = new MakefileStruct("./makefile_test_simple");
-                m.print(); //debug
-
                 if(debug)
-                    m.print(); //debug
+                    m.print();
                 
                 runDistributedMakefile(m,machs);
             }
