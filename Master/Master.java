@@ -12,10 +12,17 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class Master {
 
-    private Master() {
+    
+    static private boolean debug = true;
+    
+    public Master() {
     }
         
     private static Machine[] retrieveRemoteSlaves(String host, int slavesCount) throws RemoteException {
@@ -70,6 +77,9 @@ public class Master {
                 
                 MakefileStruct m = new MakefileStruct("./makefile_test_simple");
                 m.print(); //debug
+
+                if(debug)
+                    m.print(); //debug
                 
                 runDistributedMakefile(m,machs);
             }
