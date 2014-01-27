@@ -68,6 +68,31 @@ public class Master {
         else
             return stubs;
     }
+    
+    private static void runDistributedMakefile(MakefileStruct m, Task stubs[]) throws RemoteException {
+        
+        ArrayList<Rule> rules = m.getRules();
+        
+        // Executes rules from the end of the Makefile to the beggining, so dependencies 
+        //   should be automatically satisfied.
+        for (int i = rules.size()-1; i>0; i--) {
+            ArrayList<String> dep = rules.get(i).getDependencies();
+            
+            // Send file from dependency, if there is one
+            for(String d : dep){
+                System.out.println("Sending file " + d);
+                stubs[0].receiveFile(convertFileToBytes(d), d);
+            }
+            
+            // Sends this rule's commands to the slave            
+            ArrayList<String> commands = m.getRuleCommands(i);
+            for(String c : commands){
+                System.out.println("Sending to the slave the command " + c);
+                String response = stubs[0].doTask(c);
+                System.out.println(response);
+            }
+        }
+    }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
@@ -86,31 +111,10 @@ public class Master {
             if (stubs!=null) {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
-                //boolean ret = stubs[0].transferFile(convertFileToBytes("README.md") ,"test.md");
-                        
-                // Parse Makefile
                 MakefileStruct m = new MakefileStruct("./makefile_test");
                 //m.print(); //debug
-                ArrayList<Rule> rules = m.getRules();
-                for (int i = rules.size()-1; i>0; i--) {
-                    ArrayList<String> dep = rules.get(i).getDependencies();
-                    //choose stub
-                    for(String d : dep){
-                        System.out.println("Sending file " + d);
-                        stubs[0].receiveFile(convertFileToBytes(d), d);
-                    }
-                    ArrayList<String> commands= m.getRuleCommands(i);
-                    for(String c : commands){
-                        String response = stubs[0].doTask(c);
-                        System.out.println(response);
-                    }
-                    
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Master.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+                
+                runDistributedMakefile(m,stubs);
             }
             else
                 System.out.println("Couldn't bind all Slaves, exiting now...");

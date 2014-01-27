@@ -21,11 +21,11 @@ public class Slave implements Task {
         
         StringBuffer output = new StringBuffer();
         
-        System.out.println("Received command" + command);
+        System.out.println("Executing command: "+ command );
         
         Process p;
         try {
-            p = Runtime.getRuntime().exec("D:\\Software\\bin\\bash.exe -e " + command);
+            p = Runtime.getRuntime().exec(new String[]{"bash","-c",command});
             p.waitFor();
             BufferedReader reader
                     = new BufferedReader(new InputStreamReader(p.getInputStream()));
