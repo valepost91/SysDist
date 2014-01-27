@@ -14,13 +14,17 @@ import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class Master {
 
-    private Master() {
+    
+    static private boolean debug = true;
+    
+    public Master() {
     }
     
     private static byte[] convertFileToBytes(String path) {
@@ -71,17 +75,17 @@ public class Master {
     
     private static void runDistributedMakefile(MakefileStruct m, Task stubs[]) throws RemoteException {
         
-        ArrayList<Rule> rules = m.getRules();
+    /*    Map<String,Rule> rules = m.getRules();
         
         // Executes rules from the end of the Makefile to the beggining, so dependencies 
         //   should be automatically satisfied.
         for (int i = rules.size()-1; i>0; i--) {
-            ArrayList<String> dep = rules.get(i).getDependencies();
+            ArrayList<Rule> dep = rules.get(i).getDependencies();
             
             // Send file from dependency, if there is one
-            for(String d : dep){
-                System.out.println("Sending file " + d);
-                stubs[0].receiveFile(convertFileToBytes(d), d);
+            for(Rule d : dep){
+                System.out.println("Sending file " + d.getName());
+                stubs[0].receiveFile(convertFileToBytes(d.getName()), d.getName());
             }
             
             // Sends this rule's commands to the slave            
@@ -91,7 +95,7 @@ public class Master {
                 String response = stubs[0].doTask(c);
                 System.out.println(response);
             }
-        }
+        }*/
     }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
@@ -112,7 +116,8 @@ public class Master {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
                 MakefileStruct m = new MakefileStruct("./makefile_test");
-                //m.print(); //debug
+                if(debug)
+                    m.print(); //debug
                 
                 runDistributedMakefile(m,stubs);
             }
