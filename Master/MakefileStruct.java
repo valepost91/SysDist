@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -139,7 +140,15 @@ public final class MakefileStruct {
     }
     
     public void print() {
-        printRec(root,0);
+        System.out.println("Printing Graph from \"root\" :");
+        printRec(root,0);        
+    }
+    
+    public void printRules() {
+        System.out.println("List of rules:");
+            Set<String> listOfRules = rules.keySet();
+            for (String s : listOfRules)
+                System.out.println(s);
     }
     
 

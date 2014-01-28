@@ -24,7 +24,7 @@ public class Rule {
     }
     
     synchronized public boolean takeIt() {
-        System.out.println("TAKEN of " + this.name + " is " + taken);
+        //System.out.println("TAKEN of " + this.name + " is " + taken);
         
         if (!taken) 
             taken = true;
