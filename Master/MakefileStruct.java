@@ -38,10 +38,8 @@ public final class MakefileStruct {
         rules = new HashMap<>();
     }
     
-    public MakefileStruct(String path) throws FileNotFoundException, IOException
-    {
-        this();
-        
+    private void parseMakefile(String path) throws FileNotFoundException, IOException
+    {        
         FileReader f = new FileReader(path);
         BufferedReader b = new BufferedReader(f);
         
@@ -104,8 +102,13 @@ public final class MakefileStruct {
            }// end if
             
         }// end while
+    }
     
-    }// end function
+    public MakefileStruct(String path) throws FileNotFoundException, IOException
+    {
+        this();
+        parseMakefile(path);    
+    }
     
     ////////////////////////////////////////////////
     // Utility methods. Feel free to add your own //
@@ -124,7 +127,7 @@ public final class MakefileStruct {
         
         // Prints list of commands
         ArrayList<String> coms = r.getCommands();
-        if(coms.size()!=0)
+        if (!coms.isEmpty())
             System.out.println(spaces + "  " + "Commands (" + coms.size() + ") : ");
         for (int i = 0; i < coms.size(); i++) {
             System.out.println(spaces + "  " + "#" + i + ": " + coms.get(i));           
@@ -186,7 +189,7 @@ public final class MakefileStruct {
     }
     
     public void setRuleDependencies(String name, ArrayList<Rule> dependencies) {
-        if (rules.get(name)==null);
+        if (rules.get(name)==null)
             System.out.println("ERROR @ setRuleDependencies! Couldn't find rule " + name);
         rules.get(name).setDependencies(dependencies);
     }

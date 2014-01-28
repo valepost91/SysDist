@@ -8,18 +8,11 @@ import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Master {
 
     
-    static private boolean debug = true;
+    private static final boolean debug = true;
     
     public Master() {
     }
@@ -74,7 +67,7 @@ public class Master {
 
             MachinesList machs = new MachinesList( retrieveRemoteSlaves(host, slavesCount) );
             //stubs.toString();
-            if (machs!=null) {
+            if (machs.machs!=null) {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
                 MakefileStruct m = new MakefileStruct(makefilePath);

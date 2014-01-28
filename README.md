@@ -1,10 +1,9 @@
 To compile 
 ----------
-This will save all .class files in the root folder:
 
-	javac -d . `cat src_names`
+	make
 	
-*Remove the "-d . " option if you want to the .class files to be saved in the respective folders.*
+*Make sure to update the file src_names if you add a new Class*
 
 
 To execute

@@ -3,10 +3,13 @@
  * @author Valerio
  */
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -17,6 +20,7 @@ public class Slave implements SlaveStub {
     }
 
     // Remote function which is called to execute remotely a command
+    @Override
     public String doTask(String command) {
         
         StringBuffer output = new StringBuffer();
@@ -32,10 +36,10 @@ public class Slave implements SlaveStub {
 
             String line = "";
             while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
+                output.append(line).append("\n");
             }
 
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             System.err.println("Got exception " + e.toString());
             System.err.println
             ("ERROR: failed to execute the following command received: " + command);
@@ -47,11 +51,13 @@ public class Slave implements SlaveStub {
         return output.toString();
     }
     
-    public boolean receiveFile(byte[] b, String filename) {
+    @Override
+    public boolean saveFile(byte[] b, String filename) {
         
-        for (int i = 0; i < b.length; i++) {
+        // Print received file
+        /*for (int i = 0; i < b.length; i++) {
             System.out.print((char)b[i]);
-        }
+        }*/
         
         try {
              FileOutputStream fos = new FileOutputStream(filename);
@@ -67,10 +73,30 @@ public class Slave implements SlaveStub {
         
         return true;
     }
+    
+    private static byte[] convertFileToBytes(String path) {
+        File file = new File(path);
 
-    public static void receiveFile(String path) {
+        byte[] b = new byte[(int) file.length()];
+        try {
+              FileInputStream fileInputStream = new FileInputStream(file);
+              fileInputStream.read(b);
+              for (int i = 0; i < b.length; i++) {
+                  System.out.print((char)b[i]);
+              }
+         } catch (IOException e1) {
+            //System.out.println("Error Reading The File.");
+            return null;
+         }
         
+        return b;
     }
+
+    @Override
+    public byte[] readFile(String filename) throws RemoteException {
+        return convertFileToBytes(filename);
+    }
+        
     public static void main(String args[]) {
         
         if (args.length < 1 || args.length > 2) {
@@ -97,7 +123,7 @@ public class Slave implements SlaveStub {
                 registry.rebind("slave" + myId, stub);
                 
                 System.err.println("Slave " + myId + " ready, sir.");
-            } catch (Exception e) {
+            } catch (RemoteException e) {
                 System.err.println("Slave exception: " + e.toString());
                 System.err.println("Have you executed \"start remiregistry\" already?");
                 //e.printStackTrace();

@@ -2,6 +2,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
@@ -29,28 +30,48 @@ public class Machine {
     
     private static byte[] convertFileToBytes(String path) {
         File file = new File(path);
+        
+        if (!file.exists())
+            return null;
 
         byte[] b = new byte[(int) file.length()];
         try {
               FileInputStream fileInputStream = new FileInputStream(file);
               fileInputStream.read(b);
-              for (int i = 0; i < b.length; i++) {
-                  System.out.print((char)b[i]);
-              }
-         } catch (FileNotFoundException e) {
-                     System.out.println("File Not Found.");
-                     e.printStackTrace();
-         }
-         catch (IOException e1) {
-                  System.out.println("Error Reading The File.");
-                   e1.printStackTrace();
+         } catch (IOException e1) {
+            //System.out.println("Error Reading The File.");
          }
         
         return b;
     }
     
+    public boolean sendFile(String filename) throws RemoteException {
+        byte b[] = convertFileToBytes(filename);
+        if (b!=null) {
+            return s.saveFile(b, filename);
+        }
+        else
+            return false;
+    }
+    
     public boolean receiveFile(String filename) throws RemoteException {
-        return s.receiveFile(convertFileToBytes(filename), filename);
+        
+        byte b[] = s.readFile(filename);
+        
+        if (b==null)
+            return false;
+        
+        try {
+             FileOutputStream fos = new FileOutputStream(filename);
+             fos.write(b);
+             fos.close();
+        }
+        catch(IOException ioe)  {
+             //System.out.println("IOException : " + ioe);
+            return false;
+        }
+        
+        return true;
     }
     
     String doTask(String command) throws RemoteException {

@@ -16,7 +16,8 @@ public class MachinesList {
     public Machine[] machs;
     
     MachinesList(Machine machs[]) {
-        this.machs = machs;
+        if (machs!=null)
+            this.machs = machs;
     }
     
     synchronized public int getFreeMachine() {

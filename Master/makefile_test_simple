@@ -1,0 +1,11 @@
+sibling: sex
+	echo "a sibling is born!"
+
+sex: father mother
+	echo "sexsexsex"
+
+father:
+	echo "I'm the father."
+
+mother:
+	echo "I'm the mother."
