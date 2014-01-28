@@ -44,15 +44,19 @@ public class Master {
             return machs;
     }
     
-    private static void runDistributedMakefile(MakefileStruct m, MachinesList machs) throws RemoteException {
+    private static void runDistributedMakefile(MakefileStruct m, MachinesList machs) throws RemoteException, InterruptedException {
+        
+        long startTime = System.currentTimeMillis();
         
         RuleRunner rootRunner = new RuleRunner(m.root, machs, m);
         rootRunner.start();
+        rootRunner.join();
+        
+        long endTime = System.currentTimeMillis();
+        System.out.println("That took " + (endTime - startTime) + " milliseconds");
     }
 
-    public static void main(String[] args) throws IOException {
-
-        long startTime = System.currentTimeMillis();
+    public static void main(String[] args) throws IOException, RemoteException, InterruptedException {
         
         if (args.length != 1) {
             System.out.println("ERROR: expected at least 1 argument, found "
@@ -84,9 +88,5 @@ public class Master {
             
             
         }
-	long endTime = System.currentTimeMillis();
-	System.out.println("That took " + (endTime - startTime) + " milliseconds");
-
-
     }
 }
