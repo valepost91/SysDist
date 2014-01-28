@@ -8,6 +8,13 @@ import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import java.util.ArrayList;
+
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Master {
 
@@ -52,10 +59,12 @@ public class Master {
 
     public static void main(String[] args) throws IOException {
 
+        long startTime = System.currentTimeMillis();
+        
         if (args.length < 1 || args.length > 3) {
             System.out.println("ERROR: expected at least 2 argument, found "
                     + args.length
-                    + ". Usage: java Master <makefile_path> <slaves_count> (<registry_host>)");
+                    + ". Usage: java Master <makefile_path> <slaves_count> (<registry_host>)");    
         }
         else {
             // Process command line arguments
@@ -78,6 +87,9 @@ public class Master {
             
             
         }
+	long endTime = System.currentTimeMillis();
+	System.out.println("That took " + (endTime - startTime) + " milliseconds");
+
 
     }
 }
