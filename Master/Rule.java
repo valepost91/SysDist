@@ -8,6 +8,7 @@ public class Rule {
     private ArrayList< String > commands;
     private String name;
     public boolean isDone;
+    private boolean taken;
      
     public Rule(String name) {
         this.name=name;
@@ -20,6 +21,15 @@ public class Rule {
         this(name);
         this.dependencies = dependencies;
         this.commands = commands;
+    }
+    
+    synchronized public boolean takeIt() {
+        System.out.println("TAKEN of " + this.name + " is " + taken);
+        
+        if (!taken) 
+            taken = true;
+        
+        return taken;
     }
     
     public ArrayList< Rule> getDependencies() {

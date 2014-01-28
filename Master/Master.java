@@ -2,19 +2,11 @@
  *
  * @author Valerio
  */
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class Master {
@@ -58,26 +50,26 @@ public class Master {
         rootRunner.start();
     }
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) throws IOException {
 
-        if (args.length < 1 || args.length > 2) {
-            System.out.println("ERROR: expected at least 1 argument, found "
+        if (args.length < 1 || args.length > 3) {
+            System.out.println("ERROR: expected at least 2 argument, found "
                     + args.length
-                    + ". Usage: java Master <slaves_count> (<registry_host>)");
+                    + ". Usage: java Master <makefile_path> <slaves_count> (<registry_host>)");
         }
         else {
             // Process command line arguments
-            int slavesCount = Integer.parseInt(args[0]);
-            String host = (args.length == 2) ? args[1] : null;
+            String makefilePath = args[0];
+            int slavesCount = Integer.parseInt(args[1]);
+            String host = (args.length == 3) ? args[2] : null;
 
             MachinesList machs = new MachinesList( retrieveRemoteSlaves(host, slavesCount) );
             //stubs.toString();
             if (machs!=null) {
                 System.out.println("All " + slavesCount + " slaves bounded successfully.");
                 
-                MakefileStruct m = new MakefileStruct("./makefile_test_simple");
-                if(debug)
-                    m.print();
+                MakefileStruct m = new MakefileStruct(makefilePath);
+                m.print();
                 
                 runDistributedMakefile(m,machs);
             }

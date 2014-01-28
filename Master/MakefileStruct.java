@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -26,7 +27,7 @@ public final class MakefileStruct {
     // A makefile structure is nothing more than a list of rules
     private Map< String,Rule > rules;
     private static String lastRuleName;
-    private static boolean debug = true;
+    private static boolean debug = false;
     public Rule root;
     
     ////////////////
@@ -58,18 +59,18 @@ public final class MakefileStruct {
                
                 // CASE: this line has a rule with dependencies
                 if (tokens.length > 1) {   
-                    //System.out.println("got a rule with dependencies:\nrule: " + tokens[0]);
+                    if(debug) System.out.println("got a rule with dependencies:\nrule: " + tokens[0]);
                     lastRuleName = tokens[0];
 
                     // Split dependencies
-                    String[] depsStrings = tokens[1].split("[ ]+");
+                    String[] depsStrings = tokens[1].split("[ \t]+");
                     ArrayList<Rule> deps = new ArrayList<>();
                     for (String d : depsStrings) {
-                        //System.out.println("got a dependency: " + d);
+                        if(debug) System.out.println("got a dependency: " + d);
                         if(d.length()>0) {
-                            Rule tmp = new Rule(d);
+                            Rule tmp = this.insertRule(d);
                             deps.add(tmp);
-                            rules.put(d, tmp);
+                            rules.put(d, tmp);                            
                         }
                     }
                     
@@ -83,14 +84,14 @@ public final class MakefileStruct {
                 else {
                     // CASE: this line is a command
                     if (s.charAt(0)=='\t') {
-                        //System.out.println("got command:\n" + s);
+                        if(debug) System.out.println("got command:\n" + s);
                         this.insertRuleCommand(lastRuleName, s);
                     }
                     // CASE: this line is a rule with no dependencies at all
                     else {
-                        //System.out.println("got a rule with no dependencies:\n" + s);
+                        if(debug) System.out.println("got a rule with no dependencies:\n" + s);
                         lastRuleName = tokens[0];
-                        Rule tmp = this.insertRule(s);
+                        Rule tmp = this.insertRule(lastRuleName);
                         if (!foundRoot) {
                             root = tmp;
                             foundRoot = true;
@@ -98,7 +99,7 @@ public final class MakefileStruct {
                     }
                 }
 
-                System.out.println();
+                if(debug) System.out.println();
                 
            }// end if
             
@@ -110,29 +111,32 @@ public final class MakefileStruct {
     // Utility methods. Feel free to add your own //
     ////////////////////////////////////////////////
     
-    private void printRec(Rule r) {
-        System.out.println("--" + r.getName());
-        ArrayList<Rule> deps = r.getDependencies();
+    private void printRec(Rule r, int depth) {
+        char[] chars = new char[depth];
+        Arrays.fill(chars, '\t');
+        String spaces = new String(chars);
         
+        System.out.println(spaces + "--\"" + r.getName() + "\"");
+        ArrayList<Rule> deps = r.getDependencies();
+
         for (Rule d : deps)
-            System.out.println("dep: " + d.getName());
+            System.out.println(spaces + "  " + "dep: " + d.getName());
         
         // Prints list of commands
         ArrayList<String> coms = r.getCommands();
-        System.out.println("Commands (" + coms.size() + ") : ");
+        if(coms.size()!=0)
+            System.out.println(spaces + "  " + "Commands (" + coms.size() + ") : ");
         for (int i = 0; i < coms.size(); i++) {
-            System.out.println("#" + i + ": " + coms.get(i));           
+            System.out.println(spaces + "  " + "#" + i + ": " + coms.get(i));           
         }
         
         for (Rule d : deps) {
-            printRec(d);
+            printRec(d,depth+1);
         }
     }
     
     public void print() {
-        Rule r = root;
-        System.out.println("Printing makefile structure!");
-        printRec(r);
+        printRec(root,0);
     }
     
 
@@ -145,8 +149,14 @@ public final class MakefileStruct {
     }
     
     public Rule insertRule(String name) {
-        Rule tmp = new Rule(name);
-        rules.put(name,tmp);
+        Rule tmp;
+        
+        if (!rules.containsKey(name)) {
+            tmp = new Rule(name);
+            rules.put(name,tmp);
+        }
+        else
+            tmp = rules.get(name);
         
         return tmp;
     }
@@ -176,27 +186,27 @@ public final class MakefileStruct {
     }
     
     public void setRuleDependencies(String name, ArrayList<Rule> dependencies) {
-        if (rules.get(name)==null)
-            System.out.println("ERROR! Couldn't find rule " + name);
+        if (rules.get(name)==null);
+            System.out.println("ERROR @ setRuleDependencies! Couldn't find rule " + name);
         rules.get(name).setDependencies(dependencies);
     }
     
     public void setRuleCommands(String name, ArrayList<String> commands) {
         if (rules.get(name)==null)
-            System.out.println("ERROR! Couldn't find rule " + name);
+            System.out.println("ERROR @ setRuleCommands! Couldn't find rule " + name);
         rules.get(name).setCommands(commands);
     }
     
     public void insertRuleDependency(String name, Rule d) {
         if (rules.get(name)==null)
-            System.out.println("ERROR! Couldn't find rule " + name);
+            System.out.println("ERROR @ insertRuleDependency! Couldn't find rule " + name);
         rules.get(name).getDependencies().add(d);
             
     }
     
     public void insertRuleCommand(String name, String c) {
         if (rules.get(name)==null)
-            System.out.println("ERROR! Couldn't find rule " + name);
+            System.out.println("ERROR @ insertRuleCommand! Couldn't find rule " + name);
         rules.get(name).getCommands().add(c);
     }
     

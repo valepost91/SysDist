@@ -20,4 +20,4 @@ To execute
 
 ####Start the Master:
 
-	java Master <number_of_slaves> [<registry_host_addres>]
+	java Master <makefile_path> <number_of_slaves> [<registry_host_addres>]

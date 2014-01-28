@@ -20,22 +20,26 @@ class RuleRunner extends Thread {
        System.out.println("Starting RuleRunner thread for rule : " + r.getName());
        
        // Sleep for 1000 ms
-       try {
+       /*try {
            Thread.currentThread().sleep(1000);
        } catch (InterruptedException ex) {
            Logger.getLogger(RuleRunner.class.getName()).log(Level.SEVERE, null, ex);
-       }
+       }*/
        
        ArrayList<Rule> deps = r.getDependencies();
        
        // If it's not a leaf, check for the dependencies
        if (deps.size()>0) {
-           RuleRunner depRunners[] = new RuleRunner[deps.size()];
+           ArrayList<RuleRunner> depRunners = new ArrayList<>();
            
-           // Launch a new thread for each dependency
+           // Launch a new thread for each dependency not satisfied AND not taken
+           //   yet (a synchronized function will make sure there won't be two threads
+           //   taking the same dependency at the same time.
            for (int i = 0; i < deps.size(); i++) {
-               depRunners[i] = new RuleRunner(deps.get(i), machs, m);
-               depRunners[i].start();               
+               if (!deps.get(i).isDone && deps.get(i).takeIt()) {
+                   depRunners.add( new RuleRunner(deps.get(i), machs, m) );
+                   depRunners.get(i).start();                  
+               }
            }
            
            // Sync everyone
@@ -60,7 +64,7 @@ class RuleRunner extends Thread {
                     aMach = machs.getFreeMachine();
                 
                 // Send command
-                System.out.println("Sending to the slave the command " + c);
+                System.out.println("Sending to the slave " + aMach + " the command " + c);
                 Machine aux = machs.machs[aMach];
                 response = aux.doTask(c);
                 
