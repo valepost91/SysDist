@@ -7,6 +7,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class Master {
@@ -17,19 +19,17 @@ public class Master {
     public Master() {
     }
         
-    private static Machine[] retrieveRemoteSlaves(String host, int slavesCount) throws RemoteException {
+    private static Machine[] retrieveRemoteSlaves(ArrayList<String> hosts) throws RemoteException {
+        int slavesCount = hosts.size();
         Machine machs[] = new Machine[slavesCount];
         SlaveStub stubs[] = new SlaveStub[slavesCount];
-        
-        Registry registry = LocateRegistry.getRegistry(host);
         
         boolean allOk = true;
         for (int i = 0; i < slavesCount; i++) {
             try {
-                //stubs[i].s = (SlaveStub) registry.lookup("slave" + i);
                 machs[i] = new Machine();
+                Registry registry = LocateRegistry.getRegistry(hosts.get(i));
                 machs[i].setStub( (SlaveStub) registry.lookup("slave" + i) );
-                
                 
             } catch (NotBoundException e) {
                 System.err.println
@@ -54,21 +54,25 @@ public class Master {
 
         long startTime = System.currentTimeMillis();
         
-        if (args.length < 1 || args.length > 3) {
-            System.out.println("ERROR: expected at least 2 argument, found "
+        if (args.length != 1) {
+            System.out.println("ERROR: expected at least 1 argument, found "
                     + args.length
-                    + ". Usage: java Master <makefile_path> <slaves_count> (<registry_host>)");    
+                    + ". Usage: java Master <makefile_path> < hostFile");    
         }
         else {
             // Process command line arguments
             String makefilePath = args[0];
-            int slavesCount = Integer.parseInt(args[1]);
-            String host = (args.length == 3) ? args[2] : null;
+            
+            // Get hosts from INPUT
+            ArrayList<String> hosts = new ArrayList<>();
+            Scanner reader = new Scanner(System.in);
+            while (reader.hasNext())
+                hosts.add( reader.next() );
 
-            MachinesList machs = new MachinesList( retrieveRemoteSlaves(host, slavesCount) );
+            MachinesList machs = new MachinesList( retrieveRemoteSlaves(hosts) );
             //stubs.toString();
             if (machs.machs!=null) {
-                System.out.println("All " + slavesCount + " slaves bounded successfully.");
+                System.out.println("All " + hosts.size() + " slaves bounded successfully.");
                 
                 MakefileStruct m = new MakefileStruct(makefilePath);
                 m.print();
