@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Master {
@@ -60,6 +62,8 @@ public class Master {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
+	long startTime = System.currentTimeMillis();
+
         if (args.length < 1 || args.length > 2) {
             System.out.println("ERROR: expected at least 1 argument, found "
                     + args.length
@@ -86,6 +90,9 @@ public class Master {
             
             
         }
+	long endTime = System.currentTimeMillis();
+	System.out.println("That took " + (endTime - startTime) + " milliseconds");
+
 
     }
 }
