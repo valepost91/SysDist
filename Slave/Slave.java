@@ -51,6 +51,7 @@ public class Slave implements SlaveStub {
         return output.toString();
     }
     
+    // Used to receive files from the Master
     @Override
     public boolean saveFile(byte[] b, String filename) {
         
@@ -74,6 +75,7 @@ public class Slave implements SlaveStub {
         return true;
     }
     
+    // Prepare a file to be sent by RMI, converting it to a simple array of bytes.
     private static byte[] convertFileToBytes(String path) {
         File file = new File(path);
 
@@ -92,10 +94,12 @@ public class Slave implements SlaveStub {
         return b;
     }
 
+    // Used to send files to the Master
     @Override
     public byte[] readFile(String filename) throws RemoteException {
         return convertFileToBytes(filename);
     }
+    
         
     public static void main(String args[]) {
         
@@ -106,8 +110,8 @@ public class Slave implements SlaveStub {
         }
         else {
             // Gets the ID of this slave by command line argument. This ID is 
-            //   used to  diferentiate different slaves in the registry (se the 
-            //   rebind() call below).
+            //   used to  diferentiate different slaves in the registry (see the 
+            //   rebind() call below) when using a localhost registry.
             int myId = Integer.parseInt(args[0]);
             
             String host = (args.length == 2) ? args[1] : null;

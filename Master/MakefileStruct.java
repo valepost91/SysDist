@@ -9,15 +9,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
- * @author nrnia.dalbem
+ * @author cmdalbem
  */
 public final class MakefileStruct {    
     
@@ -115,6 +109,7 @@ public final class MakefileStruct {
     // Utility methods. Feel free to add your own //
     ////////////////////////////////////////////////
     
+    // Recursive Graph printing function
     private void printRec(Rule r, int depth) {
         char[] chars = new char[depth];
         Arrays.fill(chars, '\t');

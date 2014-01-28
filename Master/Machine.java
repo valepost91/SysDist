@@ -28,6 +28,7 @@ public class Machine {
         this.s = s;
     } 
     
+    // Prepare a file to be sent by RMI, converting it to a simple array of bytes.
     private static byte[] convertFileToBytes(String path) {
         File file = new File(path);
         
@@ -40,11 +41,13 @@ public class Machine {
               fileInputStream.read(b);
          } catch (IOException e1) {
             //System.out.println("Error Reading The File.");
+            //return null;
          }
         
         return b;
     }
     
+    // Send a file to the remote machine
     public boolean sendFile(String filename) throws RemoteException {
         byte b[] = convertFileToBytes(filename);
         if (b!=null) {
@@ -54,8 +57,8 @@ public class Machine {
             return false;
     }
     
+    // Send a file form the remote machine
     public boolean receiveFile(String filename) throws RemoteException {
-        
         byte b[] = s.readFile(filename);
         
         if (b==null)
@@ -74,6 +77,7 @@ public class Machine {
         return true;
     }
     
+    // Sends command to be executed in the remote machine
     String doTask(String command) throws RemoteException {
         return s.doTask(command);
     }

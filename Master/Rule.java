@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 
 // Structure of a Makefile rule
@@ -25,10 +24,8 @@ public class Rule {
     
     synchronized public boolean takeIt() {
         //System.out.println("TAKEN of " + this.name + " is " + taken);
-        
         if (!taken) 
-            taken = true;
-        
+            taken = true;        
         return taken;
     }
     

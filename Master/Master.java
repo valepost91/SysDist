@@ -24,6 +24,8 @@ public class Master {
         Machine machs[] = new Machine[slavesCount];
         SlaveStub stubs[] = new SlaveStub[slavesCount];
         
+        // Access each of the remote registries and retrive the stubs. At the same time,
+        //   the Machine structures are created, which will wrap the stub functions.
         boolean allOk = true;
         for (int i = 0; i < slavesCount; i++) {
             try {
@@ -48,6 +50,7 @@ public class Master {
         
         long startTime = System.currentTimeMillis();
         
+        // Handle the Root node, by which the Graph transversing will begin.
         Rule r;
         if (ruleName!=null) {
             System.out.println("ruleName = " + ruleName);
@@ -60,8 +63,11 @@ public class Master {
         
         System.out.println("rule = " + r.getName());
         
+        // Start the thread of the Root rule
         RuleRunner rootRunner = new RuleRunner(r, machs, m);
         rootRunner.start();
+        
+        // Wait the processing end, so we can measure the total time.
         rootRunner.join();
         
         long endTime = System.currentTimeMillis();
@@ -80,18 +86,17 @@ public class Master {
         else {
             // Process command line arguments
             String makefilePath = args[0];
-            
             String rule = null;
             if (args.length==2)
                 rule = args[1];
             
-            // Get hosts from INPUT
+            // Get list of hosts from the Input
             ArrayList<String> hosts = new ArrayList<>();
             Scanner reader = new Scanner(System.in);
             while (reader.hasNext())
                 hosts.add( reader.next() );
 
-            // Retrieve all stubs
+            // Connect to all Slaves
             MachinesList machs = new MachinesList( retrieveRemoteSlaves(hosts) );
             if (machs.machs!=null) {
                 System.out.println("All " + hosts.size() + " slaves bounded successfully.");
