@@ -33,8 +33,9 @@ class RuleRunner extends Thread {
             for (int i = 0; i < deps.size(); i++) {
                 // Check if dependency rule is not done neither was taken already
                 if (!deps.get(i).isDone && deps.get(i).takeIt()) {
-                    depRunners.add( new RuleRunner(deps.get(i), machs, m) );
-                    depRunners.get(i).start();            
+                    RuleRunner tmp =new RuleRunner(deps.get(i), machs, m); 
+                    depRunners.add( tmp );
+                    tmp.start();            
                 }
             }
 
