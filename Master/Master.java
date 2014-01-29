@@ -53,15 +53,13 @@ public class Master {
         // Handle the Root node, by which the Graph transversing will begin.
         Rule r;
         if (ruleName!=null) {
-            System.out.println("ruleName = " + ruleName);
+            //System.out.println("ruleName = " + ruleName);
             r = m.getRules().get(ruleName);
             if (r==null)
                 return false;
         }
         else
             r = m.root;
-        
-        System.out.println("rule = " + r.getName());
         
         // Start the thread of the Root rule
         RuleRunner rootRunner = new RuleRunner(r, machs, m);

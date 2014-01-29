@@ -22,7 +22,7 @@ public final class MakefileStruct {
     // A makefile structure is nothing more than a list of rules
     private Map< String,Rule > rules;
     private static String lastRuleName;
-    private static boolean debug = true;
+    private static boolean debug = false;
     public Rule root;
     
     ////////////////
