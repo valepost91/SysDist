@@ -129,7 +129,7 @@ public class Slave implements SlaveStub {
                 System.err.println("Slave " + myId + " ready, sir.");
             } catch (RemoteException e) {
                 System.err.println("Slave exception: " + e.toString());
-                System.err.println("Have you executed \"start remiregistry\" already?");
+                System.err.println("Have you launched the rmiregistry already?");
                 //e.printStackTrace();
             }
         }
